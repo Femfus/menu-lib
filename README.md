@@ -1,6 +1,7 @@
 # Vantura UI Library - Documentation
 
-![Vantura UI Example Image](https://raw.githubusercontent.com/Femfus/menu-lib/main/assets/menu-example.png)
+<img width="1019" height="702" alt="menu-example" src="https://github.com/user-attachments/assets/36a24fa4-b07c-422f-85c3-d2919d92648f" />
+
 
 Vantura is a premium, modern executor-only GUI library for Roblox, utilizing a clean glassmorphism aesthetic with an animated rainbow topbar accent, smooth widget transitions, and translucent controls.
 
