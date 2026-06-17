@@ -730,6 +730,7 @@ function VanturaLib:Create(options)
             elementFrame.Name = btnName .. "_Element"
             elementFrame.Size = UDim2.new(1, -6, 0, frameHeight)
             elementFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 26)
+            elementFrame.BackgroundTransparency = 0.15
             elementFrame.BorderSizePixel = 0
             elementFrame.Parent = page
 
@@ -815,6 +816,7 @@ function VanturaLib:Create(options)
             elementFrame.Name = toggleName .. "_Element"
             elementFrame.Size = UDim2.new(1, -6, 0, frameHeight)
             elementFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 26)
+            elementFrame.BackgroundTransparency = 0.15
             elementFrame.BorderSizePixel = 0
             elementFrame.Parent = page
 
@@ -857,6 +859,7 @@ function VanturaLib:Create(options)
             toggleBox.Size = UDim2.fromOffset(14, 14)
             toggleBox.Position = UDim2.new(1, -26, 0.5, -7)
             toggleBox.BackgroundColor3 = state and Color3.fromRGB(220, 38, 38) or Color3.fromRGB(15, 15, 17)
+            toggleBox.BackgroundTransparency = 0.15
             toggleBox.Text = ""
             toggleBox.BorderSizePixel = 0
             toggleBox.Parent = elementFrame
@@ -917,6 +920,7 @@ function VanturaLib:Create(options)
             elementFrame.Name = ddName .. "_Element"
             elementFrame.Size = UDim2.new(1, -6, 0, frameHeight)
             elementFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 26)
+            elementFrame.BackgroundTransparency = 0.15
             elementFrame.BorderSizePixel = 0
             elementFrame.ClipsDescendants = false
             elementFrame.Parent = page
@@ -960,6 +964,7 @@ function VanturaLib:Create(options)
             selectorBtn.Size = UDim2.new(0, 110, 0, 22)
             selectorBtn.Position = UDim2.new(1, -122, 0.5, -11)
             selectorBtn.BackgroundColor3 = Color3.fromRGB(34, 34, 38)
+            selectorBtn.BackgroundTransparency = 0.15
             selectorBtn.Text = currentVal
             selectorBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
             selectorBtn.Font = Enum.Font.Gotham
@@ -993,6 +998,7 @@ function VanturaLib:Create(options)
             listFrame.Size = UDim2.new(1, 0, 0, 0)
             listFrame.Position = UDim2.new(0, 0, 1, 2)
             listFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 30)
+            listFrame.BackgroundTransparency = 0.15
             listFrame.BorderSizePixel = 0
             listFrame.ZIndex = 20
             listFrame.Visible = false
@@ -1070,7 +1076,7 @@ function VanturaLib:Create(options)
                 local optBtn = Instance.new("TextButton")
                 optBtn.Name = opt
                 optBtn.Size = UDim2.new(1, 0, 0, 20)
-                optBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 30)
+                optBtn.BackgroundTransparency = 1
                 optBtn.BorderSizePixel = 0
                 optBtn.Text = opt
                 optBtn.TextColor3 = (opt == currentVal) and Color3.fromRGB(220, 38, 38) or Color3.fromRGB(180, 180, 185)
@@ -1121,6 +1127,104 @@ function VanturaLib:Create(options)
                         break
                     end
                 end
+            end
+
+            function controller:Get()
+                return currentVal
+            end
+
+            return controller
+        end
+
+        function tabObj:TextInput(textOptions)
+            textOptions = textOptions or {}
+            local textName = textOptions.Name or "Input"
+            local placeholder = textOptions.Placeholder or "Type here..."
+            local default = textOptions.Default or ""
+            local desc = textOptions.Description or ""
+            local callback = textOptions.Callback or function() end
+
+            local currentVal = default
+            local hasDesc = (desc ~= "")
+            local frameHeight = hasDesc and 46 or 38
+
+            local elementFrame = Instance.new("Frame")
+            elementFrame.Name = textName .. "_Element"
+            elementFrame.Size = UDim2.new(1, -6, 0, frameHeight)
+            elementFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 26)
+            elementFrame.BackgroundTransparency = 0.15
+            elementFrame.BorderSizePixel = 0
+            elementFrame.Parent = page
+
+            local elCorner = Instance.new("UICorner")
+            elCorner.CornerRadius = UDim.new(0, 3)
+            elCorner.Parent = elementFrame
+
+            local elStroke = Instance.new("UIStroke")
+            elStroke.Color = Color3.fromRGB(36, 36, 40)
+            elStroke.Thickness = 1
+            elStroke.Parent = elementFrame
+
+            local titleLabel = Instance.new("TextLabel")
+            titleLabel.Size = UDim2.new(0.4, 0, hasDesc and 0.5 or 1, 0)
+            titleLabel.Position = UDim2.new(0, 12, hasDesc and 0.08 or 0, 0)
+            titleLabel.BackgroundTransparency = 1
+            titleLabel.Text = textName
+            titleLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+            titleLabel.Font = Enum.Font.GothamMedium
+            titleLabel.TextSize = 12
+            titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+            titleLabel.Parent = elementFrame
+
+            if hasDesc then
+                local descLabel = Instance.new("TextLabel")
+                descLabel.Name = "Description"
+                descLabel.Size = UDim2.new(0.5, 0, 0.4, 0)
+                descLabel.Position = UDim2.new(0, 12, 0.5, 0)
+                descLabel.BackgroundTransparency = 1
+                descLabel.Text = desc
+                descLabel.TextColor3 = Color3.fromRGB(140, 140, 145)
+                descLabel.Font = Enum.Font.Gotham
+                descLabel.TextSize = 10
+                descLabel.TextXAlignment = Enum.TextXAlignment.Left
+                descLabel.Parent = elementFrame
+            end
+
+            local textBox = Instance.new("TextBox")
+            textBox.Name = "TextBox"
+            textBox.Size = UDim2.new(0, 110, 0, 22)
+            textBox.Position = UDim2.new(1, -122, 0.5, -11)
+            textBox.BackgroundColor3 = Color3.fromRGB(15, 15, 17)
+            textBox.BackgroundTransparency = 0.15
+            textBox.Text = default
+            textBox.PlaceholderText = placeholder
+            textBox.TextColor3 = Color3.fromRGB(220, 220, 220)
+            textBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 105)
+            textBox.Font = Enum.Font.Gotham
+            textBox.TextSize = 11
+            textBox.BorderSizePixel = 0
+            textBox.ClearTextOnFocus = false
+            textBox.Parent = elementFrame
+
+            local boxCorner = Instance.new("UICorner")
+            boxCorner.CornerRadius = UDim.new(0, 3)
+            boxCorner.Parent = textBox
+
+            local boxStroke = Instance.new("UIStroke")
+            boxStroke.Color = Color3.fromRGB(50, 50, 55)
+            boxStroke.Thickness = 1
+            boxStroke.Parent = textBox
+
+            textBox.FocusLost:Connect(function(enterPressed)
+                currentVal = textBox.Text
+                callback(currentVal)
+            end)
+
+            local controller = {}
+            function controller:Set(val)
+                currentVal = val
+                textBox.Text = val
+                callback(currentVal)
             end
 
             function controller:Get()
