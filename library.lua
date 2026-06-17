@@ -964,17 +964,50 @@ function VanturaLib:Create(options)
 
             local optionObjects = {}
 
-            local function toggleDropdown()
-                expanded = not expanded
-                listFrame.Visible = expanded
+            local controller = {}
+
+            local function updateCanvasSize()
                 if expanded then
-                    elementFrame.ZIndex = 100
-                    Tween(chevron, TweenInfo.new(0.15), { Rotation = 180 })
-                    listFrame.Size = UDim2.new(1, 0, 0, #optionsList * 20)
+                    page.CanvasSize = UDim2.new(0, 0, 0, pageLayout.AbsoluteContentSize.Y + (#optionsList * 20) + 15)
                 else
-                    elementFrame.ZIndex = 1
-                    Tween(chevron, TweenInfo.new(0.15), { Rotation = 0 })
-                    listFrame.Size = UDim2.new(1, 0, 0, 0)
+                    page.CanvasSize = UDim2.new(0, 0, 0, pageLayout.AbsoluteContentSize.Y + 10)
+                end
+            end
+
+            -- Automatically re-evaluate size when layout updates
+            local layoutConn = pageLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateCanvasSize)
+            table.insert(globalConnections, layoutConn)
+
+            local function collapseDropdown()
+                expanded = false
+                listFrame.Visible = false
+                elementFrame.ZIndex = 1
+                Tween(chevron, TweenInfo.new(0.15), { Rotation = 0 })
+                listFrame.Size = UDim2.new(1, 0, 0, 0)
+                updateCanvasSize()
+                if window.OpenDropdown == controller then
+                    window.OpenDropdown = nil
+                end
+            end
+
+            local function expandDropdown()
+                if window.OpenDropdown and window.OpenDropdown ~= controller then
+                    window.OpenDropdown:Collapse()
+                end
+                expanded = true
+                listFrame.Visible = true
+                elementFrame.ZIndex = 100
+                Tween(chevron, TweenInfo.new(0.15), { Rotation = 180 })
+                listFrame.Size = UDim2.new(1, 0, 0, #optionsList * 20)
+                updateCanvasSize()
+                window.OpenDropdown = controller
+            end
+
+            local function toggleDropdown()
+                if expanded then
+                    collapseDropdown()
+                else
+                    expandDropdown()
                 end
             end
 
@@ -1019,7 +1052,10 @@ function VanturaLib:Create(options)
                 table.insert(optionObjects, optBtn)
             end
 
-            local controller = {}
+            function controller:Collapse()
+                collapseDropdown()
+            end
+
             function controller:Set(val)
                 for _, opt in ipairs(optionsList) do
                     if opt == val then
