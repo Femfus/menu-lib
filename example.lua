@@ -6,7 +6,7 @@ local Mercury
 local success, err = pcall(function()
     -- OPTION A: Load from GitHub (Recommended for distribution)
     -- Uncomment the line below to load remotely:
-    Mercury = loadstring(game:HttpGet("https://raw.githubusercontent.com/Femfus/menu-lib/main/library.lua"))()
+    Mercury = loadstring(game:HttpGet("https://raw.githubusercontent.com/Femfus/menu-lib/main/library.lua?t=" .. os.time()))()
 
     -- OPTION B: Load from local executor workspace (Default for local development)
     if not Mercury then

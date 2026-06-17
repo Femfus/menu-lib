@@ -5,6 +5,8 @@ local HttpService = game:GetService("HttpService")
 local MercuryLib = {}
 MercuryLib.__index = MercuryLib
 
+local globalConnections = {}
+
 -- Helper: Dragging functionality for frames
 local function MakeDraggable(dragFrame, parentFrame)
     local dragging
@@ -22,31 +24,46 @@ local function MakeDraggable(dragFrame, parentFrame)
         )
     end
 
-    dragFrame.InputBegan:Connect(function(input)
+    local beganConn = dragFrame.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = parentFrame.Position
 
-            input.Changed:Connect(function()
+            local changedConn
+            changedConn = input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
+                    if changedConn then
+                        changedConn:Disconnect()
+                    end
                 end
             end)
         end
     end)
 
-    dragFrame.InputChanged:Connect(function(input)
+    local changedInputConn = dragFrame.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
         end
     end)
 
-    UserInputService.InputChanged:Connect(function(input)
+    local globalInputConn = UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             update(input)
         end
     end)
+
+    local globalEndedConn = UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+
+    table.insert(globalConnections, beganConn)
+    table.insert(globalConnections, changedInputConn)
+    table.insert(globalConnections, globalInputConn)
+    table.insert(globalConnections, globalEndedConn)
 end
 
 -- Helper: Create a smooth tween
@@ -68,7 +85,11 @@ local function LoadCustomAsset(url)
     end
 
     local cleanName = url:match("([^/]+)$"):gsub("[^%w%.]", "_")
-    local filepath = "mercury_icons_" .. cleanName
+    local hash = 0
+    for i = 1, #url do
+        hash = (hash + url:byte(i)) % 100000
+    end
+    local filepath = "mercury_icons_" .. hash .. "_" .. cleanName
 
     local success_fs, hasFileSystem = pcall(function() 
         return writefile and isfile and getcustomasset 
@@ -386,6 +407,14 @@ function MercuryLib:Create(options)
 
     -- Destroy function: Removes all traces
     local function DestroyGUI()
+        -- Disconnect global connections to prevent memory leaks
+        for _, conn in ipairs(globalConnections) do
+            if conn and conn.Connected then
+                conn:Disconnect()
+            end
+        end
+        globalConnections = {}
+
         -- Attempt to clean local icon assets
         pcall(function()
             if listfiles and delfile then
