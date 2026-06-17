@@ -62,6 +62,12 @@ local function LoadCustomAsset(url)
         return url -- Standard rbxassetid
     end
 
+    -- Gracefully detect SVGs since Roblox cannot render vector images
+    if url:lower():match("%.svg$") then
+        -- Return a default fallback Roblox asset ID (e.g. general UI symbol)
+        return "rbxassetid://6034853644"
+    end
+
     local cleanName = url:match("([^/]+)$"):gsub("[^%w%.]", "_")
     local filepath = "mercury_icons_" .. cleanName
 
@@ -90,7 +96,6 @@ local function LoadCustomAsset(url)
         end
     end
 
-    -- Return a robust fallback Roblox Icon asset ID (Eye/Visuals or Cog icon style)
     return "rbxassetid://6034853644" 
 end
 
@@ -267,7 +272,7 @@ function MercuryLib:Create(options)
     destroyBtn.Size = UDim2.fromOffset(24, 24)
     destroyBtn.Position = UDim2.new(0.5, -12, 1, -34)
     destroyBtn.BackgroundTransparency = 1
-    destroyBtn.Image = LoadCustomAsset("https://raw.githubusercontent.com/Femfus/menu-lib/refs/heads/main/icons/quit.png")
+    destroyBtn.Image = LoadCustomAsset("https://raw.githubusercontent.com/Femfus/menu-lib/main/icons/quit.png")
     destroyBtn.ImageColor3 = Color3.fromRGB(150, 50, 50)
     destroyBtn.Parent = iconSidebar
 
@@ -297,7 +302,7 @@ function MercuryLib:Create(options)
     function window:Tab(tabOptions)
         tabOptions = tabOptions or {}
         local tabName = tabOptions.Name or "Tab"
-        local iconInput = tabOptions.Icon or "https://raw.githubusercontent.com/Femfus/menu-lib/refs/heads/main/icons/file.png"
+        local iconInput = tabOptions.Icon or "https://raw.githubusercontent.com/Femfus/menu-lib/main/icons/file.png"
 
         window.TabCount = window.TabCount + 1
         local tabId = window.TabCount
