@@ -237,11 +237,11 @@ function VanturaLib:Create(options)
     mainStroke.Thickness = 1
     mainStroke.Parent = mainFrame
 
-    -- Premium Top Accent Line (Red color highlight)
+    -- Premium Top Accent Line (Rainbow animated highlight)
     local topAccent = Instance.new("Frame")
     topAccent.Name = "TopAccent"
     topAccent.Size = UDim2.new(1, 0, 0, 3)
-    topAccent.BackgroundColor3 = Color3.fromRGB(220, 38, 38) -- Bright Red
+    topAccent.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     topAccent.BorderSizePixel = 0
     topAccent.ZIndex = 5
     topAccent.Parent = mainFrame
@@ -255,9 +255,37 @@ function VanturaLib:Create(options)
     topAccentCover.Name = "Cover"
     topAccentCover.Size = UDim2.new(1, 0, 0, 2)
     topAccentCover.Position = UDim2.new(0, 0, 1, -2)
-    topAccentCover.BackgroundColor3 = topAccent.BackgroundColor3
+    topAccentCover.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     topAccentCover.BorderSizePixel = 0
     topAccentCover.Parent = topAccent
+
+    -- Rainbow Gradient and Animation
+    local rainbowGradient = Instance.new("UIGradient")
+    rainbowGradient.Parent = topAccent
+
+    local coverGradient = Instance.new("UIGradient")
+    coverGradient.Parent = topAccentCover
+
+    task.spawn(function()
+        local hueTick = 0
+        local connection
+        connection = game:GetService("RunService").RenderStepped:Connect(function(delta)
+            if not topAccent or not topAccent.Parent then
+                connection:Disconnect()
+                return
+            end
+            hueTick = hueTick + delta * 0.15 -- Speed of shifting
+            local keypoints = {}
+            for i = 0, 6 do
+                local hue = (i / 6 + hueTick) % 1
+                table.insert(keypoints, ColorSequenceKeypoint.new(i / 6, Color3.fromHSV(hue, 0.85, 1)))
+            end
+            local seq = ColorSequence.new(keypoints)
+            rainbowGradient.Color = seq
+            coverGradient.Color = seq
+        end)
+        table.insert(globalConnections, connection)
+    end)
 
     -- Dragging Handler (Header region below accent line)
     local headerFrame = Instance.new("Frame")
