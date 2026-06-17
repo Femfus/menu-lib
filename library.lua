@@ -267,9 +267,13 @@ function MercuryLib:Create(options)
     destroyBtn.Size = UDim2.fromOffset(24, 24)
     destroyBtn.Position = UDim2.new(0.5, -12, 1, -34)
     destroyBtn.BackgroundTransparency = 1
-    destroyBtn.Image = LoadCustomAsset("https://raw.githubusercontent.com/Femfus/menu-lib/refs/heads/main/icons/power.png")
+    destroyBtn.Image = LoadCustomAsset("https://raw.githubusercontent.com/Femfus/menu-lib/refs/heads/main/icons/quit.png")
     destroyBtn.ImageColor3 = Color3.fromRGB(150, 50, 50)
     destroyBtn.Parent = iconSidebar
+
+    local destroyCorner = Instance.new("UICorner")
+    destroyCorner.CornerRadius = UDim.new(0, 4)
+    destroyCorner.Parent = destroyBtn
 
     destroyBtn.MouseEnter:Connect(function()
         Tween(destroyBtn, TweenInfo.new(0.2), { ImageColor3 = Color3.fromRGB(220, 38, 38) })
@@ -293,7 +297,7 @@ function MercuryLib:Create(options)
     function window:Tab(tabOptions)
         tabOptions = tabOptions or {}
         local tabName = tabOptions.Name or "Tab"
-        local iconInput = tabOptions.Icon or "https://raw.githubusercontent.com/Femfus/menu-lib/refs/heads/main/icons/fallback.png"
+        local iconInput = tabOptions.Icon or "https://raw.githubusercontent.com/Femfus/menu-lib/refs/heads/main/icons/file.png"
 
         window.TabCount = window.TabCount + 1
         local tabId = window.TabCount
