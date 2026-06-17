@@ -201,7 +201,6 @@ function MercuryLib:Create(options)
     mainFrame.Position = UDim2.new(0.5, -size.X.Offset / 2, 0.5, -size.Y.Offset / 2)
     mainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 20)
     mainFrame.BorderSizePixel = 0
-    mainFrame.GroupColor3 = Color3.fromRGB(255, 255, 255)
     mainFrame.BackgroundTransparency = 1 -- Start transparent for transition
     mainFrame.Visible = false
     mainFrame.Parent = screenGui
