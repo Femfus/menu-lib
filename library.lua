@@ -2,8 +2,8 @@ local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local HttpService = game:GetService("HttpService")
 
-local MercuryLib = {}
-MercuryLib.__index = MercuryLib
+local VanturaLib = {}
+VanturaLib.__index = VanturaLib
 
 local globalConnections = {}
 
@@ -89,7 +89,7 @@ local function LoadCustomAsset(url)
     for i = 1, #url do
         hash = (hash + url:byte(i)) % 100000
     end
-    local filepath = "mercury_icons_" .. hash .. "_" .. cleanName
+    local filepath = "vantura_icons_" .. hash .. "_" .. cleanName
 
     local success_fs, hasFileSystem = pcall(function() 
         return writefile and isfile and getcustomasset 
@@ -119,9 +119,9 @@ local function LoadCustomAsset(url)
     return "rbxassetid://6034853644" 
 end
 
-function MercuryLib:Create(options)
+function VanturaLib:Create(options)
     options = options or {}
-    local windowTitle = options.Name or "Mercury GUI"
+    local windowTitle = options.Name or "Vantura GUI"
     local size = options.Size or UDim2.fromOffset(620, 400)
 
     -- Detect parent (CoreGui for exploits, PlayerGui for testing in studio)
@@ -135,7 +135,7 @@ function MercuryLib:Create(options)
 
     -- Create ScreenGui
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "MercuryLib_" .. HttpService:GenerateGUID(false):gsub("-", ""):sub(1, 8)
+    screenGui.Name = "VanturaLib_" .. HttpService:GenerateGUID(false):gsub("-", ""):sub(1, 8)
     screenGui.ResetOnSpawn = false
     screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     screenGui.Parent = parent
@@ -419,7 +419,7 @@ function MercuryLib:Create(options)
         pcall(function()
             if listfiles and delfile then
                 for _, file in ipairs(listfiles("")) do
-                    if file:match("mercury_icons_") then
+                    if file:match("vantura_icons_") then
                         delfile(file)
                     end
                 end
@@ -862,9 +862,202 @@ function MercuryLib:Create(options)
                 updateToggle()
                 callback(state)
             end)
+
+            local controller = {}
+            function controller:SetState(val)
+                state = val
+                updateToggle()
+                callback(state)
+            end
+            function controller:GetState()
+                return state
+            end
+
+            return controller
+        end
+
+        function tabObj:Dropdown(ddOptions)
+            ddOptions = ddOptions or {}
+            local ddName = ddOptions.Name or "Dropdown"
+            local optionsList = ddOptions.Options or {}
+            local default = ddOptions.Default or optionsList[1] or ""
+            local callback = ddOptions.Callback or function() end
+
+            local currentVal = default
+            local expanded = false
+
+            local elementFrame = Instance.new("Frame")
+            elementFrame.Name = ddName .. "_Element"
+            elementFrame.Size = UDim2.new(1, -6, 0, 38)
+            elementFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 26)
+            elementFrame.BorderSizePixel = 0
+            elementFrame.ClipsDescendants = false
+            elementFrame.Parent = page
+
+            local elCorner = Instance.new("UICorner")
+            elCorner.CornerRadius = UDim.new(0, 3)
+            elCorner.Parent = elementFrame
+
+            local elStroke = Instance.new("UIStroke")
+            elStroke.Color = Color3.fromRGB(36, 36, 40)
+            elStroke.Thickness = 1
+            elStroke.Parent = elementFrame
+
+            local titleLabel = Instance.new("TextLabel")
+            titleLabel.Size = UDim2.new(0.4, 0, 1, 0)
+            titleLabel.Position = UDim2.new(0, 12, 0, 0)
+            titleLabel.BackgroundTransparency = 1
+            titleLabel.Text = ddName
+            titleLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+            titleLabel.Font = Enum.Font.GothamMedium
+            titleLabel.TextSize = 12
+            titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+            titleLabel.Parent = elementFrame
+
+            local selectorBtn = Instance.new("TextButton")
+            selectorBtn.Name = "Selector"
+            selectorBtn.Size = UDim2.new(0, 110, 0, 22)
+            selectorBtn.Position = UDim2.new(1, -122, 0.5, -11)
+            selectorBtn.BackgroundColor3 = Color3.fromRGB(34, 34, 38)
+            selectorBtn.Text = currentVal
+            selectorBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+            selectorBtn.Font = Enum.Font.Gotham
+            selectorBtn.TextSize = 11
+            selectorBtn.BorderSizePixel = 0
+            selectorBtn.ZIndex = 8
+            selectorBtn.Parent = elementFrame
+
+            local selCorner = Instance.new("UICorner")
+            selCorner.CornerRadius = UDim.new(0, 3)
+            selCorner.Parent = selectorBtn
+
+            local selStroke = Instance.new("UIStroke")
+            selStroke.Color = Color3.fromRGB(50, 50, 55)
+            selStroke.Thickness = 1
+            selStroke.Parent = selectorBtn
+
+            local chevron = Instance.new("ImageLabel")
+            chevron.Name = "Chevron"
+            chevron.Size = UDim2.fromOffset(10, 10)
+            chevron.Position = UDim2.new(1, -16, 0.5, -5)
+            chevron.BackgroundTransparency = 1
+            chevron.Image = "rbxassetid://6034818372" -- Standard down chevron
+            chevron.ImageColor3 = Color3.fromRGB(150, 150, 155)
+            chevron.ZIndex = 9
+            chevron.Parent = selectorBtn
+
+            -- Options container frame (absolute positioning beneath option)
+            local listFrame = Instance.new("Frame")
+            listFrame.Name = "OptionsList"
+            listFrame.Size = UDim2.new(1, 0, 0, 0)
+            listFrame.Position = UDim2.new(0, 0, 1, 2)
+            listFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 30)
+            listFrame.BorderSizePixel = 0
+            listFrame.ZIndex = 20
+            listFrame.Visible = false
+            listFrame.Parent = selectorBtn
+
+            local listCorner = Instance.new("UICorner")
+            listCorner.CornerRadius = UDim.new(0, 3)
+            listCorner.Parent = listFrame
+
+            local listStroke = Instance.new("UIStroke")
+            listStroke.Color = Color3.fromRGB(50, 50, 55)
+            listStroke.Thickness = 1
+            listStroke.Parent = listFrame
+
+            local listLayout = Instance.new("UIListLayout")
+            listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+            listLayout.Parent = listFrame
+
+            local function refreshSelectorText()
+                selectorBtn.Text = currentVal
+            end
+
+            local optionObjects = {}
+
+            local function toggleDropdown()
+                expanded = not expanded
+                listFrame.Visible = expanded
+                if expanded then
+                    Tween(chevron, TweenInfo.new(0.15), { Rotation = 180 })
+                    listFrame.Size = UDim2.new(1, 0, 0, #optionsList * 20)
+                else
+                    Tween(chevron, TweenInfo.new(0.15), { Rotation = 0 })
+                    listFrame.Size = UDim2.new(1, 0, 0, 0)
+                end
+            end
+
+            selectorBtn.MouseButton1Click:Connect(toggleDropdown)
+
+            for i, opt in ipairs(optionsList) do
+                local optBtn = Instance.new("TextButton")
+                optBtn.Name = opt
+                optBtn.Size = UDim2.new(1, 0, 0, 20)
+                optBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 30)
+                optBtn.BorderSizePixel = 0
+                optBtn.Text = opt
+                optBtn.TextColor3 = (opt == currentVal) and Color3.fromRGB(220, 38, 38) or Color3.fromRGB(180, 180, 185)
+                optBtn.Font = Enum.Font.Gotham
+                optBtn.TextSize = 10
+                optBtn.LayoutOrder = i
+                optBtn.ZIndex = 21
+                optBtn.Parent = listFrame
+
+                optBtn.MouseEnter:Connect(function()
+                    if currentVal ~= opt then
+                        Tween(optBtn, TweenInfo.new(0.1), { TextColor3 = Color3.fromRGB(240, 240, 240) })
+                    end
+                end)
+
+                optBtn.MouseLeave:Connect(function()
+                    if currentVal ~= opt then
+                        Tween(optBtn, TweenInfo.new(0.1), { TextColor3 = Color3.fromRGB(180, 180, 185) })
+                    end
+                end)
+
+                optBtn.MouseButton1Click:Connect(function()
+                    currentVal = opt
+                    refreshSelectorText()
+                    toggleDropdown()
+                    for _, obj in ipairs(optionObjects) do
+                        obj.TextColor3 = (obj.Text == currentVal) and Color3.fromRGB(220, 38, 38) or Color3.fromRGB(180, 180, 185)
+                    end
+                    callback(currentVal)
+                end)
+
+                table.insert(optionObjects, optBtn)
+            end
+
+            local controller = {}
+            function controller:Set(val)
+                for _, opt in ipairs(optionsList) do
+                    if opt == val then
+                        currentVal = val
+                        refreshSelectorText()
+                        for _, obj in ipairs(optionObjects) do
+                            obj.TextColor3 = (obj.Text == currentVal) and Color3.fromRGB(220, 38, 38) or Color3.fromRGB(180, 180, 185)
+                        end
+                        callback(currentVal)
+                        break
+                    end
+                end
+            end
+
+            function controller:Get()
+                return currentVal
+            end
+
+            return controller
         end
 
         return tabObj
+    end
+
+    function window:SetSize(newSize)
+        size = newSize
+        mainFrame.Size = size
+        mainFrame.Position = UDim2.new(0.5, -size.X.Offset / 2, 0.5, -size.Y.Offset / 2)
     end
 
     function window:Destroy()
@@ -874,4 +1067,4 @@ function MercuryLib:Create(options)
     return window
 end
 
-return MercuryLib
+return VanturaLib
