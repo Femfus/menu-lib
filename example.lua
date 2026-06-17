@@ -266,25 +266,23 @@ widgets["MenuSize"] = SettingsTab:Dropdown({
     end
 })
 
--- Active Config Slot select
-local currentConfigSlot = "Slot 1"
-widgets["ConfigSlot"] = SettingsTab:Dropdown({
-    Name = "Active Config Slot",
-    Options = {"Slot 1", "Slot 2", "Slot 3"},
-    Default = "Slot 1",
+-- Custom Config Name input
+local configFilename = "default_config"
+widgets["ConfigName"] = SettingsTab:TextInput({
+    Name = "Config File Name",
+    Placeholder = "Enter config name...",
+    Default = "default_config",
+    Description = "Name of the config file to save or load.",
     Callback = function(val)
-        currentConfigSlot = val
-        GUI:Notification({
-            Name = "Config Selection",
-            Description = "Switched active slot to " .. val .. ".",
-            Duration = 2.5
-        })
+        if val ~= "" then
+            configFilename = val:gsub("[^%w_%-]", "")
+        end
     end
 })
 
 SettingsTab:Button({
     Name = "Save Config",
-    Description = "Saves active features to local JSON configuration for selected slot.",
+    Description = "Saves active features to local JSON configuration file.",
     Callback = function()
         local configData = {}
         for key, widget in pairs(widgets) do
@@ -300,7 +298,7 @@ SettingsTab:Button({
         end)
         
         local fsSuccess = false
-        local filename = "vantura_config_" .. currentConfigSlot:gsub(" ", "_"):lower() .. ".json"
+        local filename = configFilename .. ".json"
         if success then
             local pcallFs = pcall(function()
                 if writefile then
@@ -329,11 +327,11 @@ SettingsTab:Button({
 
 SettingsTab:Button({
     Name = "Load Config",
-    Description = "Applies stored configurations from local JSON file for selected slot.",
+    Description = "Applies stored configurations from local JSON file.",
     Callback = function()
         local successLoad = false
         local dataLoaded = nil
-        local filename = "vantura_config_" .. currentConfigSlot:gsub(" ", "_"):lower() .. ".json"
+        local filename = configFilename .. ".json"
 
         pcall(function()
             if isfile and isfile(filename) and readfile then
