@@ -188,16 +188,25 @@ local function setupCharacter(player, char)
     local folder = Instance.new("Folder")
     folder.Name = "Vantura_ESP_" .. player.Name
 
-    -- Outline Chams (Boxes substitute)
+    -- Outline Chams (Red fill, white outline)
     local highlight = Instance.new("Highlight")
     highlight.Name = "Chams"
     highlight.FillColor = Color3.fromRGB(220, 38, 38)
     highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-    highlight.FillTransparency = 0.6
-    highlight.OutlineTransparency = 0.1
+    highlight.FillTransparency = 0.5
+    highlight.OutlineTransparency = 0
     highlight.Adornee = char
-    highlight.Enabled = espOptions.enabled and espOptions.boxes
+    highlight.Enabled = espOptions.enabled
     highlight.Parent = folder
+
+    -- 3D Bounding Box (SelectionBox)
+    local selectionBox = Instance.new("SelectionBox")
+    selectionBox.Name = "BoxESP"
+    selectionBox.Color3 = Color3.fromRGB(0, 255, 0) -- Green outline
+    selectionBox.LineThickness = 0.03
+    selectionBox.Adornee = char
+    selectionBox.Enabled = espOptions.enabled and espOptions.boxes
+    selectionBox.Parent = folder
 
     -- Billboard for Name & Health
     local head = char:WaitForChild("Head", 5)
@@ -250,7 +259,11 @@ local function applyESPState()
         pcall(function()
             local highlight = folder:FindFirstChild("Chams")
             if highlight then
-                highlight.Enabled = espOptions.enabled and espOptions.boxes
+                highlight.Enabled = espOptions.enabled
+            end
+            local selectionBox = folder:FindFirstChild("BoxESP")
+            if selectionBox then
+                selectionBox.Enabled = espOptions.enabled and espOptions.boxes
             end
             local billboard = folder:FindFirstChild("NameTag")
             if billboard then
