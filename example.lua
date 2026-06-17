@@ -58,12 +58,6 @@ end)
 -- Centralized registry for configurations
 local widgets = {}
 
--- Centralized ESP Library reference (loads locally/falls back)
-local ESPLib
-pcall(function()
-    ESPLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Femfus/menu-lib/main/esp.lua"))() -- Remote fallback
-end)
-
 -- Tab 1: Aimbot (General Tab)
 local AimbotTab = GUI:Tab({
     Name = "General",
@@ -173,6 +167,131 @@ TriggerTab:Button({
 })
 
 
+-- Dynamic built-in ESP functionality
+local espOptions = {
+    enabled = false,
+    names = true,
+    boxes = true,
+    healthBars = true,
+    limitDistance = false
+}
+
+local espObjects = {}
+
+local function setupCharacter(player, char)
+    if not char then return end
+    if espObjects[player] then
+        pcall(function() espObjects[player]:Destroy() end)
+        espObjects[player] = nil
+    end
+
+    local folder = Instance.new("Folder")
+    folder.Name = "Vantura_ESP_" .. player.Name
+
+    -- Outline Chams (Boxes substitute)
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "Chams"
+    highlight.FillColor = Color3.fromRGB(220, 38, 38)
+    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+    highlight.FillTransparency = 0.6
+    highlight.OutlineTransparency = 0.1
+    highlight.Adornee = char
+    highlight.Enabled = espOptions.enabled and espOptions.boxes
+    highlight.Parent = folder
+
+    -- Billboard for Name & Health
+    local head = char:WaitForChild("Head", 5)
+    if head then
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "NameTag"
+        billboard.Size = UDim2.new(0, 120, 0, 32)
+        billboard.AlwaysOnTop = true
+        billboard.Adornee = head
+        billboard.StudsOffset = Vector3.new(0, 2.5, 0)
+        billboard.Enabled = espOptions.enabled and espOptions.names
+        billboard.Parent = folder
+
+        local nameLabel = Instance.new("TextLabel")
+        nameLabel.Name = "NameLabel"
+        nameLabel.Size = UDim2.new(1, 0, 0.5, 0)
+        nameLabel.BackgroundTransparency = 1
+        nameLabel.Text = player.Name
+        nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        nameLabel.Font = Enum.Font.GothamBold
+        nameLabel.TextSize = 10
+        nameLabel.Parent = billboard
+
+        local healthLabel = Instance.new("TextLabel")
+        healthLabel.Name = "HealthLabel"
+        healthLabel.Size = UDim2.new(1, 0, 0.5, 0)
+        healthLabel.Position = UDim2.new(0, 0, 0.5, 0)
+        healthLabel.BackgroundTransparency = 1
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        healthLabel.Text = humanoid and ("HP: " .. math.floor(humanoid.Health)) or "HP: 100"
+        healthLabel.TextColor3 = Color3.fromRGB(46, 204, 113)
+        healthLabel.Font = Enum.Font.GothamMedium
+        healthLabel.TextSize = 9
+        healthLabel.Visible = espOptions.healthBars
+        healthLabel.Parent = billboard
+
+        if humanoid then
+            humanoid.HealthChanged:Connect(function(health)
+                healthLabel.Text = "HP: " .. math.floor(health)
+            end)
+        end
+    end
+
+    folder.Parent = char
+    espObjects[player] = folder
+end
+
+local function applyESPState()
+    for player, folder in pairs(espObjects) do
+        pcall(function()
+            local highlight = folder:FindFirstChild("Chams")
+            if highlight then
+                highlight.Enabled = espOptions.enabled and espOptions.boxes
+            end
+            local billboard = folder:FindFirstChild("NameTag")
+            if billboard then
+                billboard.Enabled = espOptions.enabled and espOptions.names
+                local healthLabel = billboard:FindFirstChild("HealthLabel")
+                if healthLabel then
+                    healthLabel.Visible = espOptions.healthBars
+                end
+            end
+        end)
+    end
+end
+
+local function initESP()
+    local Players = game:GetService("Players")
+    local function monitorPlayer(player)
+        if player == Players.LocalPlayer then return end
+        player.CharacterAdded:Connect(function(char)
+            setupCharacter(player, char)
+        end)
+        if player.Character then
+            task.spawn(setupCharacter, player, player.Character)
+        end
+    end
+
+    Players.PlayerAdded:Connect(monitorPlayer)
+    for _, player in ipairs(Players:GetPlayers()) do
+        monitorPlayer(player)
+    end
+
+    Players.PlayerRemoving:Connect(function(player)
+        if espObjects[player] then
+            pcall(function() espObjects[player]:Destroy() end)
+            espObjects[player] = nil
+        end
+    end)
+end
+
+task.spawn(initESP)
+
+
 -- Tab 3: Visuals (ESP options)
 local VisualsTab = GUI:Tab({
     Name = "Visuals",
@@ -184,14 +303,8 @@ widgets["EnableESP"] = VisualsTab:Toggle({
     Name = "Enable Master ESP",
     StartingState = false,
     Callback = function(state)
-        if ESPLib then
-            ESPLib.options.enabled = state
-            if state then
-                pcall(function() ESPLib:Load() end)
-            else
-                pcall(function() ESPLib:Unload() end)
-            end
-        end
+        espOptions.enabled = state
+        applyESPState()
         GUI:Notification({
             Name = "Visuals ESP",
             Description = state and "Master ESP modules active." or "Master ESP cleared.",
@@ -204,9 +317,8 @@ widgets["ESPNames"] = VisualsTab:Toggle({
     Name = "Show Player Names",
     StartingState = true,
     Callback = function(state)
-        if ESPLib then
-            ESPLib.options.names = state
-        end
+        espOptions.names = state
+        applyESPState()
     end
 })
 
@@ -214,9 +326,8 @@ widgets["ESPBoxes"] = VisualsTab:Toggle({
     Name = "Show Box ESP",
     StartingState = true,
     Callback = function(state)
-        if ESPLib then
-            ESPLib.options.boxes = state
-        end
+        espOptions.boxes = state
+        applyESPState()
     end
 })
 
@@ -224,9 +335,8 @@ widgets["ESPHashBars"] = VisualsTab:Toggle({
     Name = "Show Health Bars",
     StartingState = true,
     Callback = function(state)
-        if ESPLib then
-            ESPLib.options.healthBars = state
-        end
+        espOptions.healthBars = state
+        applyESPState()
     end
 })
 
@@ -234,9 +344,8 @@ widgets["ESPLimitDistance"] = VisualsTab:Toggle({
     Name = "Limit Render Distance",
     StartingState = false,
     Callback = function(state)
-        if ESPLib then
-            ESPLib.options.limitDistance = state
-        end
+        espOptions.limitDistance = state
+        applyESPState()
     end
 })
 
