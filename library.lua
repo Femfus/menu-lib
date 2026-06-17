@@ -267,7 +267,7 @@ function MercuryLib:Create(options)
     destroyBtn.Size = UDim2.fromOffset(24, 24)
     destroyBtn.Position = UDim2.new(0.5, -12, 1, -34)
     destroyBtn.BackgroundTransparency = 1
-    destroyBtn.Image = "rbxassetid://6031097229"
+    destroyBtn.Image = LoadCustomAsset("https://raw.githubusercontent.com/Femfus/menu-lib/refs/heads/main/icons/power.png")
     destroyBtn.ImageColor3 = Color3.fromRGB(150, 50, 50)
     destroyBtn.Parent = iconSidebar
 
@@ -293,7 +293,7 @@ function MercuryLib:Create(options)
     function window:Tab(tabOptions)
         tabOptions = tabOptions or {}
         local tabName = tabOptions.Name or "Tab"
-        local iconInput = tabOptions.Icon or "rbxassetid://6031225818"
+        local iconInput = tabOptions.Icon or "https://raw.githubusercontent.com/Femfus/menu-lib/refs/heads/main/icons/fallback.png"
 
         window.TabCount = window.TabCount + 1
         local tabId = window.TabCount
