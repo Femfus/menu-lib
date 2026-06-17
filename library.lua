@@ -56,6 +56,31 @@ local function Tween(instance, info, propertyTable)
     return tween
 end
 
+-- Helper: Load remote web icons dynamically for Roblox executors
+local function LoadCustomAsset(url)
+    if not tostring(url):match("^http") then
+        return url -- Standard rbxassetid or fallback
+    end
+
+    local cleanName = url:match("([^/]+)$"):gsub("[^%w%.]", "_")
+    local filepath = "mercury_icons_" .. cleanName
+
+    local hasFileSystem = pcall(function() return writefile and isfile and getcustomasset end)
+    if hasFileSystem then
+        if not isfile(filepath) then
+            local success, data = pcall(function() return game:HttpGet(url) end)
+            if success and data then
+                writefile(filepath, data)
+            else
+                return "" -- Fail silently
+            end
+        end
+        return getcustomasset(filepath)
+    end
+
+    return "" -- Return empty in environments like standard Roblox Studio testing
+end
+
 function MercuryLib:Create(options)
     options = options or {}
     local windowTitle = options.Name or "Mercury GUI"
@@ -77,7 +102,7 @@ function MercuryLib:Create(options)
     screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     screenGui.Parent = parent
 
-    -- Main Container Frame (Deep near-black background)
+    -- Main Container Frame
     local mainFrame = Instance.new("Frame")
     mainFrame.Name = "MainFrame"
     mainFrame.Size = size
@@ -86,22 +111,20 @@ function MercuryLib:Create(options)
     mainFrame.BorderSizePixel = 0
     mainFrame.Parent = screenGui
 
-    -- Rounded corners
     local mainCorner = Instance.new("UICorner")
     mainCorner.CornerRadius = UDim.new(0, 5)
     mainCorner.Parent = mainFrame
 
-    -- Thin border matching CS:GO/CS2 layout style
     local mainStroke = Instance.new("UIStroke")
     mainStroke.Color = Color3.fromRGB(45, 45, 50)
     mainStroke.Thickness = 1
     mainStroke.Parent = mainFrame
 
-    -- Premium Top Accent Line (Red color highlight from image)
+    -- Premium Top Accent Line
     local topAccent = Instance.new("Frame")
     topAccent.Name = "TopAccent"
     topAccent.Size = UDim2.new(1, 0, 0, 3)
-    topAccent.BackgroundColor3 = Color3.fromRGB(220, 38, 38) -- Bright Red
+    topAccent.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
     topAccent.BorderSizePixel = 0
     topAccent.ZIndex = 5
     topAccent.Parent = mainFrame
@@ -110,7 +133,6 @@ function MercuryLib:Create(options)
     topAccentCorner.CornerRadius = UDim.new(0, 5)
     topAccentCorner.Parent = topAccent
 
-    -- Cover bottom corners of top accent to keep it clean
     local topAccentCover = Instance.new("Frame")
     topAccentCover.Name = "Cover"
     topAccentCover.Size = UDim2.new(1, 0, 0, 2)
@@ -119,7 +141,7 @@ function MercuryLib:Create(options)
     topAccentCover.BorderSizePixel = 0
     topAccentCover.Parent = topAccent
 
-    -- Dragging Handler (Header region below accent line)
+    -- Dragging Handler
     local headerFrame = Instance.new("Frame")
     headerFrame.Name = "Header"
     headerFrame.Size = UDim2.new(1, 0, 0, 37)
@@ -128,7 +150,7 @@ function MercuryLib:Create(options)
     headerFrame.Parent = mainFrame
     MakeDraggable(headerFrame, mainFrame)
 
-    -- Header Title (Left aligned)
+    -- Header Title
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Name = "Title"
     titleLabel.Size = UDim2.new(1, -100, 1, 0)
@@ -141,7 +163,7 @@ function MercuryLib:Create(options)
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.Parent = headerFrame
 
-    -- Vertical Icon Sidebar Strip (Far Left)
+    -- Vertical Icon Sidebar Strip
     local iconSidebar = Instance.new("Frame")
     iconSidebar.Name = "IconSidebar"
     iconSidebar.Size = UDim2.new(0, 48, 1, -40)
@@ -150,7 +172,6 @@ function MercuryLib:Create(options)
     iconSidebar.BorderSizePixel = 0
     iconSidebar.Parent = mainFrame
 
-    -- Inner line separation
     local sidebarSeparator = Instance.new("Frame")
     sidebarSeparator.Size = UDim2.new(0, 1, 1, 0)
     sidebarSeparator.Position = UDim2.new(1, -1, 0, 0)
@@ -174,7 +195,7 @@ function MercuryLib:Create(options)
     iconsLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
     iconsLayout.Parent = scrollIcons
 
-    -- Text sub-tabs label column (Beside icons)
+    -- Text sub-tabs label column
     local tabSidebar = Instance.new("Frame")
     tabSidebar.Name = "TabSidebar"
     tabSidebar.Size = UDim2.new(0, 112, 1, -40)
@@ -214,16 +235,26 @@ function MercuryLib:Create(options)
 
     -- Destroy function: Removes all traces
     local function DestroyGUI()
+        -- Attempt to clean local icon assets
+        pcall(function()
+            if listfiles and delfile then
+                for _, file in ipairs(listfiles("")) do
+                    if file:match("mercury_icons_") then
+                        delfile(file)
+                    end
+                end
+            end
+        end)
         screenGui:Destroy()
     end
 
-    -- Create Destroy Script Button at the bottom of the Left Icon Sidebar
+    -- Create Destroy Script Button
     local destroyBtn = Instance.new("ImageButton")
     destroyBtn.Name = "DestroyButton"
     destroyBtn.Size = UDim2.fromOffset(24, 24)
     destroyBtn.Position = UDim2.new(0.5, -12, 1, -34)
     destroyBtn.BackgroundTransparency = 1
-    destroyBtn.Image = "rbxassetid://6031097229" -- Power icon
+    destroyBtn.Image = "rbxassetid://6031097229"
     destroyBtn.ImageColor3 = Color3.fromRGB(150, 50, 50)
     destroyBtn.Parent = iconSidebar
 
@@ -249,7 +280,7 @@ function MercuryLib:Create(options)
     function window:Tab(tabOptions)
         tabOptions = tabOptions or {}
         local tabName = tabOptions.Name or "Tab"
-        local iconId = tabOptions.Icon or "rbxassetid://6031225818" -- Fallback icon
+        local iconInput = tabOptions.Icon or "rbxassetid://6031225818"
 
         window.TabCount = window.TabCount + 1
         local tabId = window.TabCount
@@ -278,9 +309,9 @@ function MercuryLib:Create(options)
         -- Icon button (on Left Strip)
         local iconButton = Instance.new("ImageButton")
         iconButton.Name = tabName .. "_IconBtn"
-        iconButton.Size = UDim2.fromOffset(28, 28)
+        iconButton.Size = UDim2.fromOffset(24, 24)
         iconButton.BackgroundTransparency = 1
-        iconButton.Image = iconId
+        iconButton.Image = LoadCustomAsset(iconInput)
         iconButton.ImageColor3 = Color3.fromRGB(100, 100, 105)
         iconButton.LayoutOrder = tabId
         iconButton.Parent = scrollIcons
@@ -293,15 +324,14 @@ function MercuryLib:Create(options)
         tabButton.Text = ""
         tabButton.BorderSizePixel = 0
         tabButton.LayoutOrder = tabId
-        tabButton.Visible = false -- Controlled by categories
         tabButton.Parent = scrollTabs
 
-        -- Red Vertical Indicator bar on left edge of the tab button (matches general style)
+        -- Red Vertical Indicator bar
         local tabIndicator = Instance.new("Frame")
         tabIndicator.Name = "Indicator"
         tabIndicator.Size = UDim2.new(0, 2, 1, 0)
         tabIndicator.Position = UDim2.new(0, 0, 0, 0)
-        tabIndicator.BackgroundColor3 = Color3.fromRGB(220, 38, 38) -- Accent Red
+        tabIndicator.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
         tabIndicator.BorderSizePixel = 0
         tabIndicator.BackgroundTransparency = 1
         tabIndicator.Parent = tabButton
@@ -341,7 +371,7 @@ function MercuryLib:Create(options)
             tabIndicator.BackgroundTransparency = 0
             tabLabel.TextColor3 = Color3.fromRGB(240, 240, 240)
             tabLabel.Font = Enum.Font.GothamBold
-            iconButton.ImageColor3 = Color3.fromRGB(220, 38, 38) -- Active Red Icon
+            iconButton.ImageColor3 = Color3.fromRGB(220, 38, 38)
         end
 
         tabButton.MouseButton1Click:Connect(Select)
@@ -366,9 +396,6 @@ function MercuryLib:Create(options)
         tabButton.MouseLeave:Connect(onLeave)
         iconButton.MouseEnter:Connect(onEnter)
         iconButton.MouseLeave:Connect(onLeave)
-
-        -- Make it visible (by default showing all)
-        tabButton.Visible = true
 
         if not window.ActiveTab then
             Select()
@@ -408,7 +435,6 @@ function MercuryLib:Create(options)
             titleLabel.TextXAlignment = Enum.TextXAlignment.Left
             titleLabel.Parent = elementFrame
 
-            -- Sharp Action button
             local actionBtn = Instance.new("TextButton")
             actionBtn.Name = "Trigger"
             actionBtn.Size = UDim2.new(0, 70, 0, 22)
@@ -476,7 +502,6 @@ function MercuryLib:Create(options)
             titleLabel.TextXAlignment = Enum.TextXAlignment.Left
             titleLabel.Parent = elementFrame
 
-            -- Checkbox / Toggle square box matching image config indicators
             local toggleBox = Instance.new("TextButton")
             toggleBox.Name = "ToggleBox"
             toggleBox.Size = UDim2.fromOffset(14, 14)
