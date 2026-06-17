@@ -266,9 +266,25 @@ widgets["MenuSize"] = SettingsTab:Dropdown({
     end
 })
 
+-- Active Config Slot select
+local currentConfigSlot = "Slot 1"
+widgets["ConfigSlot"] = SettingsTab:Dropdown({
+    Name = "Active Config Slot",
+    Options = {"Slot 1", "Slot 2", "Slot 3"},
+    Default = "Slot 1",
+    Callback = function(val)
+        currentConfigSlot = val
+        GUI:Notification({
+            Name = "Config Selection",
+            Description = "Switched active slot to " .. val .. ".",
+            Duration = 2.5
+        })
+    end
+})
+
 SettingsTab:Button({
-    Name = "Save Config (Default)",
-    Description = "Saves active features to local JSON configuration.",
+    Name = "Save Config",
+    Description = "Saves active features to local JSON configuration for selected slot.",
     Callback = function()
         local configData = {}
         for key, widget in pairs(widgets) do
@@ -284,10 +300,11 @@ SettingsTab:Button({
         end)
         
         local fsSuccess = false
+        local filename = "vantura_config_" .. currentConfigSlot:gsub(" ", "_"):lower() .. ".json"
         if success then
             local pcallFs = pcall(function()
                 if writefile then
-                    writefile("vantura_config.json", json)
+                    writefile(filename, json)
                     fsSuccess = true
                 end
             end)
@@ -297,7 +314,7 @@ SettingsTab:Button({
         if fsSuccess then
             GUI:Notification({
                 Name = "Configuration",
-                Description = "All client states saved to vantura_config.json.",
+                Description = "Saved configuration to " .. filename .. ".",
                 Duration = 4.0
             })
         else
@@ -311,15 +328,16 @@ SettingsTab:Button({
 })
 
 SettingsTab:Button({
-    Name = "Load Config (Default)",
-    Description = "Applies stored configurations from local JSON file.",
+    Name = "Load Config",
+    Description = "Applies stored configurations from local JSON file for selected slot.",
     Callback = function()
         local successLoad = false
         local dataLoaded = nil
+        local filename = "vantura_config_" .. currentConfigSlot:gsub(" ", "_"):lower() .. ".json"
 
         pcall(function()
-            if isfile and isfile("vantura_config.json") and readfile then
-                local content = readfile("vantura_config.json")
+            if isfile and isfile(filename) and readfile then
+                local content = readfile(filename)
                 if content then
                     local decodeSuccess, decoded = pcall(function()
                         return game:GetService("HttpService"):JSONDecode(content)
@@ -345,13 +363,13 @@ SettingsTab:Button({
             end
             GUI:Notification({
                 Name = "Configuration",
-                Description = "Default setup applied from JSON file.",
+                Description = "Applied configuration from " .. filename .. ".",
                 Duration = 4.0
             })
         else
             GUI:Notification({
                 Name = "Load Failed",
-                Description = "vantura_config.json not found or corrupted.",
+                Description = filename .. " not found or corrupted.",
                 Duration = 4.0
             })
         end

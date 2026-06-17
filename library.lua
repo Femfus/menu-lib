@@ -350,6 +350,7 @@ function VanturaLib:Create(options)
     pageContainer.Size = UDim2.new(1, -172, 1, -52)
     pageContainer.Position = UDim2.new(0, 166, 0, 44)
     pageContainer.BackgroundTransparency = 1
+    pageContainer.ClipsDescendants = false
     pageContainer.Parent = mainFrame
 
     -- Stacking Notification ScreenGui Layer
@@ -618,6 +619,7 @@ function VanturaLib:Create(options)
         page.Size = UDim2.new(1, -6, 1, 0)
         page.BackgroundTransparency = 1
         page.BorderSizePixel = 0
+        page.ClipsDescendants = false
         page.Visible = false
         page.ScrollBarThickness = 3
         page.ScrollBarImageColor3 = Color3.fromRGB(45, 45, 50)
@@ -980,9 +982,11 @@ function VanturaLib:Create(options)
                 expanded = not expanded
                 listFrame.Visible = expanded
                 if expanded then
+                    elementFrame.ZIndex = 100
                     Tween(chevron, TweenInfo.new(0.15), { Rotation = 180 })
                     listFrame.Size = UDim2.new(1, 0, 0, #optionsList * 20)
                 else
+                    elementFrame.ZIndex = 1
                     Tween(chevron, TweenInfo.new(0.15), { Rotation = 0 })
                     listFrame.Size = UDim2.new(1, 0, 0, 0)
                 end
