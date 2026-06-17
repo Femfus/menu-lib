@@ -64,7 +64,6 @@ local function LoadCustomAsset(url)
 
     -- Gracefully detect SVGs since Roblox cannot render vector images
     if url:lower():match("%.svg$") then
-        -- Return a default fallback Roblox asset ID (e.g. general UI symbol)
         return "rbxassetid://6034853644"
     end
 
@@ -120,29 +119,109 @@ function MercuryLib:Create(options)
     screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     screenGui.Parent = parent
 
-    -- Main Container Frame
+    -- Loading Progression GUI Centered Container
+    local loadingFrame = Instance.new("Frame")
+    loadingFrame.Name = "LoadingFrame"
+    loadingFrame.Size = UDim2.fromOffset(300, 120)
+    loadingFrame.Position = UDim2.new(0.5, -150, 0.5, -60)
+    loadingFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 20)
+    loadingFrame.BorderSizePixel = 0
+    loadingFrame.ZIndex = 10
+    loadingFrame.Parent = screenGui
+
+    local loadingCorner = Instance.new("UICorner")
+    loadingCorner.CornerRadius = UDim.new(0, 5)
+    loadingCorner.Parent = loadingFrame
+
+    local loadingStroke = Instance.new("UIStroke")
+    loadingStroke.Color = Color3.fromRGB(45, 45, 50)
+    loadingStroke.Thickness = 1
+    loadingStroke.Parent = loadingFrame
+
+    -- Loading Red Top Line
+    local loadingAccent = Instance.new("Frame")
+    loadingAccent.Size = UDim2.new(1, 0, 0, 3)
+    loadingAccent.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
+    loadingAccent.BorderSizePixel = 0
+    loadingAccent.Parent = loadingFrame
+
+    local loadingAccentCorner = Instance.new("UICorner")
+    loadingAccentCorner.CornerRadius = UDim.new(0, 5)
+    loadingAccentCorner.Parent = loadingAccent
+
+    -- Loading title
+    local loadingTitle = Instance.new("TextLabel")
+    loadingTitle.Size = UDim2.new(1, 0, 0, 30)
+    loadingTitle.Position = UDim2.new(0, 0, 0, 15)
+    loadingTitle.BackgroundTransparency = 1
+    loadingTitle.Text = windowTitle
+    loadingTitle.TextColor3 = Color3.fromRGB(240, 240, 240)
+    loadingTitle.Font = Enum.Font.GothamBold
+    loadingTitle.TextSize = 14
+    loadingTitle.Parent = loadingFrame
+
+    -- Loading description info
+    local loadingDesc = Instance.new("TextLabel")
+    loadingDesc.Size = UDim2.new(1, 0, 0, 20)
+    loadingDesc.Position = UDim2.new(0, 0, 0, 45)
+    loadingDesc.BackgroundTransparency = 1
+    loadingDesc.Text = "Configuring client assets..."
+    loadingDesc.TextColor3 = Color3.fromRGB(150, 150, 155)
+    loadingDesc.Font = Enum.Font.Gotham
+    loadingDesc.TextSize = 11
+    loadingDesc.Parent = loadingFrame
+
+    -- Progress Bar Background
+    local pBarBg = Instance.new("Frame")
+    pBarBg.Size = UDim2.new(0.8, 0, 0, 6)
+    pBarBg.Position = UDim2.new(0.1, 0, 0, 80)
+    pBarBg.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+    pBarBg.BorderSizePixel = 0
+    pBarBg.Parent = loadingFrame
+
+    local pBarBgCorner = Instance.new("UICorner")
+    pBarBgCorner.CornerRadius = UDim.new(1, 0)
+    pBarBgCorner.Parent = pBarBg
+
+    -- Progress Bar Filling
+    local pBarFill = Instance.new("Frame")
+    pBarFill.Size = UDim2.new(0, 0, 1, 0)
+    pBarFill.BackgroundColor3 = Color3.fromRGB(220, 38, 38) -- Accent red
+    pBarFill.BorderSizePixel = 0
+    pBarFill.Parent = pBarBg
+
+    local pBarFillCorner = Instance.new("UICorner")
+    pBarFillCorner.CornerRadius = UDim.new(1, 0)
+    pBarFillCorner.Parent = pBarFill
+
+    -- Main Container Frame (Deep near-black background)
     local mainFrame = Instance.new("Frame")
     mainFrame.Name = "MainFrame"
     mainFrame.Size = size
     mainFrame.Position = UDim2.new(0.5, -size.X.Offset / 2, 0.5, -size.Y.Offset / 2)
     mainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 20)
     mainFrame.BorderSizePixel = 0
+    mainFrame.GroupColor3 = Color3.fromRGB(255, 255, 255)
+    mainFrame.BackgroundTransparency = 1 -- Start transparent for transition
+    mainFrame.Visible = false
     mainFrame.Parent = screenGui
 
+    -- Rounded corners
     local mainCorner = Instance.new("UICorner")
     mainCorner.CornerRadius = UDim.new(0, 5)
     mainCorner.Parent = mainFrame
 
+    -- Thin border matching CS:GO/CS2 layout style
     local mainStroke = Instance.new("UIStroke")
     mainStroke.Color = Color3.fromRGB(45, 45, 50)
     mainStroke.Thickness = 1
     mainStroke.Parent = mainFrame
 
-    -- Premium Top Accent Line
+    -- Premium Top Accent Line (Red color highlight)
     local topAccent = Instance.new("Frame")
     topAccent.Name = "TopAccent"
     topAccent.Size = UDim2.new(1, 0, 0, 3)
-    topAccent.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
+    topAccent.BackgroundColor3 = Color3.fromRGB(220, 38, 38) -- Bright Red
     topAccent.BorderSizePixel = 0
     topAccent.ZIndex = 5
     topAccent.Parent = mainFrame
@@ -151,6 +230,7 @@ function MercuryLib:Create(options)
     topAccentCorner.CornerRadius = UDim.new(0, 5)
     topAccentCorner.Parent = topAccent
 
+    -- Cover bottom corners of top accent to keep it clean
     local topAccentCover = Instance.new("Frame")
     topAccentCover.Name = "Cover"
     topAccentCover.Size = UDim2.new(1, 0, 0, 2)
@@ -159,7 +239,7 @@ function MercuryLib:Create(options)
     topAccentCover.BorderSizePixel = 0
     topAccentCover.Parent = topAccent
 
-    -- Dragging Handler
+    -- Dragging Handler (Header region below accent line)
     local headerFrame = Instance.new("Frame")
     headerFrame.Name = "Header"
     headerFrame.Size = UDim2.new(1, 0, 0, 37)
@@ -168,7 +248,7 @@ function MercuryLib:Create(options)
     headerFrame.Parent = mainFrame
     MakeDraggable(headerFrame, mainFrame)
 
-    -- Header Title
+    -- Header Title (Left aligned)
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Name = "Title"
     titleLabel.Size = UDim2.new(1, -100, 1, 0)
@@ -181,7 +261,7 @@ function MercuryLib:Create(options)
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.Parent = headerFrame
 
-    -- Vertical Icon Sidebar Strip
+    -- Vertical Icon Sidebar Strip (Far Left)
     local iconSidebar = Instance.new("Frame")
     iconSidebar.Name = "IconSidebar"
     iconSidebar.Size = UDim2.new(0, 48, 1, -40)
@@ -190,6 +270,7 @@ function MercuryLib:Create(options)
     iconSidebar.BorderSizePixel = 0
     iconSidebar.Parent = mainFrame
 
+    -- Inner line separation
     local sidebarSeparator = Instance.new("Frame")
     sidebarSeparator.Size = UDim2.new(0, 1, 1, 0)
     sidebarSeparator.Position = UDim2.new(1, -1, 0, 0)
@@ -213,7 +294,7 @@ function MercuryLib:Create(options)
     iconsLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
     iconsLayout.Parent = scrollIcons
 
-    -- Text sub-tabs label column
+    -- Text sub-tabs label column (Beside icons)
     local tabSidebar = Instance.new("Frame")
     tabSidebar.Name = "TabSidebar"
     tabSidebar.Size = UDim2.new(0, 112, 1, -40)
@@ -251,6 +332,59 @@ function MercuryLib:Create(options)
     pageContainer.BackgroundTransparency = 1
     pageContainer.Parent = mainFrame
 
+    -- Stacking Notification ScreenGui Layer
+    local toastContainer = Instance.new("Frame")
+    toastContainer.Name = "ToastContainer"
+    toastContainer.Size = UDim2.new(0, 280, 1, -20)
+    toastContainer.Position = UDim2.new(1, -290, 0, 10)
+    toastContainer.BackgroundTransparency = 1
+    toastContainer.Parent = screenGui
+
+    local toastLayout = Instance.new("UIListLayout")
+    toastLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    toastLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+    toastLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+    toastLayout.Padding = UDim.new(0, 8)
+    toastLayout.Parent = toastContainer
+
+    -- Handle group fade out for loading
+    local function TransitionToMenu()
+        -- Fade Loading elements
+        Tween(loadingTitle, TweenInfo.new(0.3), { TextTransparency = 1 })
+        Tween(loadingDesc, TweenInfo.new(0.3), { TextTransparency = 1 })
+        Tween(pBarBg, TweenInfo.new(0.3), { BackgroundTransparency = 1 })
+        Tween(pBarFill, TweenInfo.new(0.3), { BackgroundTransparency = 1 })
+        local fadeTween = Tween(loadingFrame, TweenInfo.new(0.4), { BackgroundTransparency = 1 })
+        fadeTween.Completed:Connect(function()
+            loadingFrame:Destroy()
+            
+            -- Fade in menu frame
+            mainFrame.Visible = true
+            -- Set internal transparencies
+            mainFrame.BackgroundTransparency = 0
+            mainStroke.Transparency = 0
+            topAccent.BackgroundTransparency = 0
+            iconSidebar.BackgroundTransparency = 0
+            sidebarSeparator.BackgroundTransparency = 0
+            tabSidebar.BackgroundTransparency = 0
+            tabSeparator.BackgroundTransparency = 0
+        end)
+    end
+
+    -- Trigger mock progress bar animation
+    task.spawn(function()
+        task.wait(0.2)
+        loadingDesc.Text = "Synchronizing hooks..."
+        Tween(pBarFill, TweenInfo.new(0.6, Enum.EasingStyle.Sine), { Size = UDim2.new(0.4, 0, 1, 0) })
+        task.wait(0.6)
+        loadingDesc.Text = "Loading theme configs..."
+        Tween(pBarFill, TweenInfo.new(0.5, Enum.EasingStyle.Sine), { Size = UDim2.new(0.75, 0, 1, 0) })
+        task.wait(0.5)
+        loadingDesc.Text = "Ready."
+        local finalFill = Tween(pBarFill, TweenInfo.new(0.4, Enum.EasingStyle.Sine), { Size = UDim2.new(1.0, 0, 1, 0) })
+        finalFill.Completed:Connect(TransitionToMenu)
+    end)
+
     -- Destroy function: Removes all traces
     local function DestroyGUI()
         -- Attempt to clean local icon assets
@@ -273,7 +407,7 @@ function MercuryLib:Create(options)
     destroyBtn.Position = UDim2.new(0.5, -12, 1, -34)
     destroyBtn.BackgroundTransparency = 1
     destroyBtn.Image = LoadCustomAsset("https://raw.githubusercontent.com/Femfus/menu-lib/main/icons/quit.png")
-    destroyBtn.ImageColor3 = Color3.fromRGB(200, 200, 205) -- Light Grey by default (visible)
+    destroyBtn.ImageColor3 = Color3.fromRGB(200, 200, 205)
     destroyBtn.Parent = iconSidebar
 
     local destroyCorner = Instance.new("UICorner")
@@ -281,12 +415,14 @@ function MercuryLib:Create(options)
     destroyCorner.Parent = destroyBtn
 
     destroyBtn.MouseEnter:Connect(function()
-        Tween(destroyBtn, TweenInfo.new(0.2), { ImageColor3 = Color3.fromRGB(220, 38, 38) }) -- Bright Red on hover
+        Tween(destroyBtn, TweenInfo.new(0.2), { ImageColor3 = Color3.fromRGB(220, 38, 38) })
     end)
     destroyBtn.MouseLeave:Connect(function()
         Tween(destroyBtn, TweenInfo.new(0.2), { ImageColor3 = Color3.fromRGB(200, 200, 205) })
     end)
     destroyBtn.MouseButton1Click:Connect(DestroyGUI)
+
+    local activeToasts = {}
 
     local window = {
         ScreenGui = screenGui,
@@ -298,6 +434,147 @@ function MercuryLib:Create(options)
         ActiveTab = nil,
         TabCount = 0
     }
+
+    -- Toast system method
+    function window:Notification(toastOptions)
+        toastOptions = toastOptions or {}
+        local toastTitle = toastOptions.Name or "System Alert"
+        local message = toastOptions.Description or ""
+        local duration = toastOptions.Duration or 3.5
+
+        -- Manage Queue Cap: Remove oldest if > 3
+        if #activeToasts >= 3 then
+            local oldest = activeToasts[1]
+            if oldest then
+                oldest:Dismiss()
+            end
+        end
+
+        local toastFrame = Instance.new("Frame")
+        toastFrame.Name = "Toast"
+        toastFrame.Size = UDim2.new(1, 0, 0, 52)
+        toastFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 26)
+        toastFrame.BorderSizePixel = 0
+        -- Start slide offset to the right
+        toastFrame.Position = UDim2.new(0, 60, 0, 0)
+        toastFrame.BackgroundTransparency = 1
+        toastFrame.ZIndex = 15
+        toastFrame.Parent = toastContainer
+
+        local toastCorner = Instance.new("UICorner")
+        toastCorner.CornerRadius = UDim.new(0, 4)
+        toastCorner.Parent = toastFrame
+
+        local toastStroke = Instance.new("UIStroke")
+        toastStroke.Color = Color3.fromRGB(45, 45, 50)
+        toastStroke.Thickness = 1
+        toastStroke.Transparency = 1
+        toastStroke.Parent = toastFrame
+
+        -- Notification Left Red Indicator Stripe
+        local toastStripe = Instance.new("Frame")
+        toastStripe.Size = UDim2.new(0, 3, 1, 0)
+        toastStripe.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
+        toastStripe.BorderSizePixel = 0
+        toastStripe.BackgroundTransparency = 1
+        toastStripe.Parent = toastFrame
+
+        local stripeCorner = Instance.new("UICorner")
+        stripeCorner.CornerRadius = UDim.new(0, 4)
+        stripeCorner.Parent = toastStripe
+
+        -- Title Label
+        local tLabel = Instance.new("TextLabel")
+        tLabel.Size = UDim2.new(1, -20, 0.45, 0)
+        tLabel.Position = UDim2.new(0, 10, 0.08, 0)
+        tLabel.BackgroundTransparency = 1
+        tLabel.Text = toastTitle
+        tLabel.TextColor3 = Color3.fromRGB(240, 240, 240)
+        tLabel.Font = Enum.Font.GothamBold
+        tLabel.TextSize = 11
+        tLabel.TextXAlignment = Enum.TextXAlignment.Left
+        tLabel.TextTransparency = 1
+        tLabel.Parent = toastFrame
+
+        -- Desc Label
+        local dLabel = Instance.new("TextLabel")
+        dLabel.Size = UDim2.new(1, -20, 0.45, 0)
+        dLabel.Position = UDim2.new(0, 10, 0.45, 0)
+        dLabel.BackgroundTransparency = 1
+        dLabel.Text = message
+        dLabel.TextColor3 = Color3.fromRGB(150, 150, 155)
+        dLabel.Font = Enum.Font.Gotham
+        dLabel.TextSize = 10
+        dLabel.TextXAlignment = Enum.TextXAlignment.Left
+        dLabel.TextTransparency = 1
+        dLabel.Parent = toastFrame
+
+        -- Bottom Progress Timer Bar
+        local tBar = Instance.new("Frame")
+        tBar.Size = UDim2.new(1, 0, 0, 2)
+        tBar.Position = UDim2.new(0, 0, 1, -2)
+        tBar.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
+        tBar.BorderSizePixel = 0
+        tBar.BackgroundTransparency = 1
+        tBar.Parent = toastFrame
+
+        local barCorner = Instance.new("UICorner")
+        barCorner.CornerRadius = UDim.new(0, 4)
+        barCorner.Parent = tBar
+
+        local toastObj = {}
+
+        local function reparentToasts()
+            for i, toast in ipairs(activeToasts) do
+                toast.Frame.LayoutOrder = i
+            end
+        end
+
+        local function Dismiss()
+            -- Remove from track list
+            for i, v in ipairs(activeToasts) do
+                if v == toastObj then
+                    table.remove(activeToasts, i)
+                    break
+                end
+            end
+            
+            reparentToasts()
+
+            -- Fade Out & Slide Right
+            Tween(tLabel, TweenInfo.new(0.2), { TextTransparency = 1 })
+            Tween(dLabel, TweenInfo.new(0.2), { TextTransparency = 1 })
+            Tween(tBar, TweenInfo.new(0.2), { BackgroundTransparency = 1 })
+            Tween(toastStroke, TweenInfo.new(0.2), { Transparency = 1 })
+            Tween(toastStripe, TweenInfo.new(0.2), { BackgroundTransparency = 1 })
+            local slideOut = Tween(toastFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { BackgroundTransparency = 1, Position = UDim2.new(0, 60, 0, 0) })
+            
+            slideOut.Completed:Connect(function()
+                toastFrame:Destroy()
+            end)
+        end
+
+        toastObj.Frame = toastFrame
+        toastObj.Dismiss = Dismiss
+
+        table.insert(activeToasts, toastObj)
+        reparentToasts()
+
+        -- Fade and slide in
+        Tween(toastFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { BackgroundTransparency = 0, Position = UDim2.new(0, 0, 0, 0) })
+        Tween(toastStroke, TweenInfo.new(0.25), { Transparency = 0 })
+        Tween(toastStripe, TweenInfo.new(0.25), { BackgroundTransparency = 0 })
+        Tween(tLabel, TweenInfo.new(0.25), { TextTransparency = 0 })
+        Tween(dLabel, TweenInfo.new(0.25), { TextTransparency = 0 })
+        Tween(tBar, TweenInfo.new(0.25), { BackgroundTransparency = 0 })
+
+        -- Progress bar shrinking (100% to 0%)
+        local progressTween = Tween(tBar, TweenInfo.new(duration, Enum.EasingStyle.Linear), { Size = UDim2.new(0, 0, 0, 2) })
+        
+        progressTween.Completed:Connect(function()
+            Dismiss()
+        end)
+    end
 
     function window:Tab(tabOptions)
         tabOptions = tabOptions or {}
@@ -334,7 +611,7 @@ function MercuryLib:Create(options)
         iconButton.Size = UDim2.fromOffset(24, 24)
         iconButton.BackgroundTransparency = 1
         iconButton.Image = LoadCustomAsset(iconInput)
-        iconButton.ImageColor3 = Color3.fromRGB(180, 180, 185) -- Light Grey/White default
+        iconButton.ImageColor3 = Color3.fromRGB(180, 180, 185)
         iconButton.LayoutOrder = tabId
         iconButton.Parent = scrollIcons
 
@@ -386,14 +663,14 @@ function MercuryLib:Create(options)
                 window.ActiveTab.Indicator.BackgroundTransparency = 1
                 window.ActiveTab.Label.TextColor3 = Color3.fromRGB(130, 130, 135)
                 window.ActiveTab.Label.Font = Enum.Font.Gotham
-                window.ActiveTab.IconButton.ImageColor3 = Color3.fromRGB(180, 180, 185) -- De-select back to light grey
+                window.ActiveTab.IconButton.ImageColor3 = Color3.fromRGB(180, 180, 185)
             end
             window.ActiveTab = tabObj
             page.Visible = true
             tabIndicator.BackgroundTransparency = 0
             tabLabel.TextColor3 = Color3.fromRGB(240, 240, 240)
             tabLabel.Font = Enum.Font.GothamBold
-            iconButton.ImageColor3 = Color3.fromRGB(255, 255, 255) -- Active Pure White Icon
+            iconButton.ImageColor3 = Color3.fromRGB(255, 255, 255)
         end
 
         tabButton.MouseButton1Click:Connect(Select)

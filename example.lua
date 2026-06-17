@@ -37,10 +37,21 @@ if not Mercury or not success then
 end
 
 -- Initialize the GUI container matching the CS:GO style Title
+-- This automatically triggers the loading screen sequence before showing the menu
 local GUI = Mercury:Create({
     Name = "Counter-Strike Client",
     Size = UDim2.fromOffset(620, 400)
 })
+
+-- Queue initial notification after UI loads
+task.spawn(function()
+    task.wait(2.2) -- Wait for loading screen to fade out
+    GUI:Notification({
+        Name = "Client Loaded",
+        Description = "Premium modules ready to configure.",
+        Duration = 4.0
+    })
+end)
 
 -- Tab 1: Aimbot (General Tab)
 local AimbotTab = GUI:Tab({
@@ -52,7 +63,11 @@ AimbotTab:Toggle({
     Name = "Aimbock",
     StartingState = false,
     Callback = function(state)
-        print("[Client] Aimbot enabled: " .. tostring(state))
+        GUI:Notification({
+            Name = "Aimbot Toggle",
+            Description = state and "Aim Assist activated." or "Aim Assist deactivated.",
+            Duration = 3.0
+        })
     end
 })
 
@@ -60,7 +75,11 @@ AimbotTab:Toggle({
     Name = "Force Attack",
     StartingState = false,
     Callback = function(state)
-        print("[Client] Force Attack set to: " .. tostring(state))
+        GUI:Notification({
+            Name = "Force Attack",
+            Description = state and "Force attack override enabled." or "Force attack override disabled.",
+            Duration = 3.0
+        })
     end
 })
 
@@ -99,7 +118,11 @@ TriggerTab:Toggle({
     Name = "Triggerbot Active",
     StartingState = false,
     Callback = function(state)
-        print("[Client] Triggerbot set to: " .. tostring(state))
+        GUI:Notification({
+            Name = "Triggerbot Active",
+            Description = state and "Auto fire enabled." or "Auto fire disabled.",
+            Duration = 3.0
+        })
     end
 })
 
@@ -115,7 +138,11 @@ TriggerTab:Button({
     Name = "Optimize Hitbox Delay",
     Description = "Forces trigger reaction to execute within 1ms intervals.",
     Callback = function()
-        print("[Client] Optimizing Hitbox Delay...")
+        GUI:Notification({
+            Name = "Hitbox Optimized",
+            Description = "Trigger response optimized to 1ms intervals.",
+            Duration = 3.5
+        })
     end
 })
 
@@ -130,7 +157,11 @@ VisualsTab:Toggle({
     Name = "Enable ESP Outlines",
     StartingState = false,
     Callback = function(state)
-        print("[Client] ESP Outline rendering: " .. tostring(state))
+        GUI:Notification({
+            Name = "Visuals ESP",
+            Description = state and "Entity outline rendering active." or "Entity outlines cleared.",
+            Duration = 3.0
+        })
     end
 })
 
@@ -161,7 +192,11 @@ SettingsTab:Button({
     Name = "Save Config (Default)",
     Description = "Saves active features to local JSON configuration.",
     Callback = function()
-        print("[Client] Configuration saved to workspace/default.json")
+        GUI:Notification({
+            Name = "Configuration",
+            Description = "Current config saved successfully.",
+            Duration = 4.0
+        })
     end
 })
 
@@ -169,7 +204,11 @@ SettingsTab:Button({
     Name = "Load Config (Default)",
     Description = "Applies stored configurations from local JSON file.",
     Callback = function()
-        print("[Client] Configuration successfully loaded.")
+        GUI:Notification({
+            Name = "Configuration",
+            Description = "Default setup applied from JSON file.",
+            Duration = 4.0
+        })
     end
 })
 
