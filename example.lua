@@ -72,6 +72,7 @@ local AimbotTab = GUI:Tab({
 
 widgets["Aimbot"] = AimbotTab:Toggle({
     Name = "Aimbock",
+    Description = "Enables automatic target tracking assistance.",
     StartingState = false,
     Callback = function(state)
         GUI:Notification({
@@ -113,6 +114,7 @@ widgets["CheckWalls"] = AimbotTab:Toggle({
 -- Player WalkSpeed control dropdown
 widgets["PlayerSpeed"] = AimbotTab:Dropdown({
     Name = "Walk Speed Override",
+    Description = "Alters character movement speed value.",
     Options = {"16 (Normal)", "32 (Fast)", "64 (Extreme)"},
     Default = "16 (Normal)",
     Callback = function(val)
@@ -371,6 +373,14 @@ SettingsTab:Button({
                 Duration = 4.0
             })
         end
+    end
+})
+
+SettingsTab:Button({
+    Name = "Unload GUI",
+    Description = "Destroys the screen interface and disconnects connections.",
+    Callback = function()
+        GUI:Destroy()
     end
 })
 
