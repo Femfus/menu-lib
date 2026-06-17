@@ -314,7 +314,7 @@ function VanturaLib:Create(options)
     iconSidebar.Name = "IconSidebar"
     iconSidebar.Size = UDim2.new(0, 48, 1, -40)
     iconSidebar.Position = UDim2.new(0, 0, 0, 40)
-    iconSidebar.BackgroundColor3 = Color3.fromRGB(12, 12, 14)
+    iconSidebar.BackgroundColor3 = Color3.fromRGB(18, 18, 20)
     iconSidebar.BorderSizePixel = 0
     iconSidebar.Parent = mainFrame
 
@@ -347,7 +347,7 @@ function VanturaLib:Create(options)
     tabSidebar.Name = "TabSidebar"
     tabSidebar.Size = UDim2.new(0, 112, 1, -40)
     tabSidebar.Position = UDim2.new(0, 48, 0, 40)
-    tabSidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 17)
+    tabSidebar.BackgroundColor3 = Color3.fromRGB(18, 18, 20)
     tabSidebar.BorderSizePixel = 0
     tabSidebar.Parent = mainFrame
 
