@@ -273,7 +273,7 @@ function MercuryLib:Create(options)
     destroyBtn.Position = UDim2.new(0.5, -12, 1, -34)
     destroyBtn.BackgroundTransparency = 1
     destroyBtn.Image = LoadCustomAsset("https://raw.githubusercontent.com/Femfus/menu-lib/main/icons/quit.png")
-    destroyBtn.ImageColor3 = Color3.fromRGB(150, 50, 50)
+    destroyBtn.ImageColor3 = Color3.fromRGB(200, 200, 205) -- Light Grey by default (visible)
     destroyBtn.Parent = iconSidebar
 
     local destroyCorner = Instance.new("UICorner")
@@ -281,10 +281,10 @@ function MercuryLib:Create(options)
     destroyCorner.Parent = destroyBtn
 
     destroyBtn.MouseEnter:Connect(function()
-        Tween(destroyBtn, TweenInfo.new(0.2), { ImageColor3 = Color3.fromRGB(220, 38, 38) })
+        Tween(destroyBtn, TweenInfo.new(0.2), { ImageColor3 = Color3.fromRGB(220, 38, 38) }) -- Bright Red on hover
     end)
     destroyBtn.MouseLeave:Connect(function()
-        Tween(destroyBtn, TweenInfo.new(0.2), { ImageColor3 = Color3.fromRGB(150, 50, 50) })
+        Tween(destroyBtn, TweenInfo.new(0.2), { ImageColor3 = Color3.fromRGB(200, 200, 205) })
     end)
     destroyBtn.MouseButton1Click:Connect(DestroyGUI)
 
@@ -334,7 +334,7 @@ function MercuryLib:Create(options)
         iconButton.Size = UDim2.fromOffset(24, 24)
         iconButton.BackgroundTransparency = 1
         iconButton.Image = LoadCustomAsset(iconInput)
-        iconButton.ImageColor3 = Color3.fromRGB(100, 100, 105)
+        iconButton.ImageColor3 = Color3.fromRGB(180, 180, 185) -- Light Grey/White default
         iconButton.LayoutOrder = tabId
         iconButton.Parent = scrollIcons
 
@@ -386,14 +386,14 @@ function MercuryLib:Create(options)
                 window.ActiveTab.Indicator.BackgroundTransparency = 1
                 window.ActiveTab.Label.TextColor3 = Color3.fromRGB(130, 130, 135)
                 window.ActiveTab.Label.Font = Enum.Font.Gotham
-                window.ActiveTab.IconButton.ImageColor3 = Color3.fromRGB(100, 100, 105)
+                window.ActiveTab.IconButton.ImageColor3 = Color3.fromRGB(180, 180, 185) -- De-select back to light grey
             end
             window.ActiveTab = tabObj
             page.Visible = true
             tabIndicator.BackgroundTransparency = 0
             tabLabel.TextColor3 = Color3.fromRGB(240, 240, 240)
             tabLabel.Font = Enum.Font.GothamBold
-            iconButton.ImageColor3 = Color3.fromRGB(220, 38, 38)
+            iconButton.ImageColor3 = Color3.fromRGB(255, 255, 255) -- Active Pure White Icon
         end
 
         tabButton.MouseButton1Click:Connect(Select)
@@ -403,14 +403,14 @@ function MercuryLib:Create(options)
         local function onEnter()
             if window.ActiveTab ~= tabObj then
                 Tween(tabLabel, TweenInfo.new(0.15), { TextColor3 = Color3.fromRGB(200, 200, 205) })
-                Tween(iconButton, TweenInfo.new(0.15), { ImageColor3 = Color3.fromRGB(180, 180, 185) })
+                Tween(iconButton, TweenInfo.new(0.15), { ImageColor3 = Color3.fromRGB(240, 240, 245) })
             end
         end
 
         local function onLeave()
             if window.ActiveTab ~= tabObj then
                 Tween(tabLabel, TweenInfo.new(0.15), { TextColor3 = Color3.fromRGB(130, 130, 135) })
-                Tween(iconButton, TweenInfo.new(0.15), { ImageColor3 = Color3.fromRGB(100, 100, 105) })
+                Tween(iconButton, TweenInfo.new(0.15), { ImageColor3 = Color3.fromRGB(180, 180, 185) })
             end
         end
 
