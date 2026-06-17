@@ -59,26 +59,39 @@ end
 -- Helper: Load remote web icons dynamically for Roblox executors
 local function LoadCustomAsset(url)
     if not tostring(url):match("^http") then
-        return url -- Standard rbxassetid or fallback
+        return url -- Standard rbxassetid
     end
 
     local cleanName = url:match("([^/]+)$"):gsub("[^%w%.]", "_")
     local filepath = "mercury_icons_" .. cleanName
 
-    local hasFileSystem = pcall(function() return writefile and isfile and getcustomasset end)
-    if hasFileSystem then
-        if not isfile(filepath) then
-            local success, data = pcall(function() return game:HttpGet(url) end)
-            if success and data then
-                writefile(filepath, data)
-            else
-                return "" -- Fail silently
+    local success_fs, hasFileSystem = pcall(function() 
+        return writefile and isfile and getcustomasset 
+    end)
+    
+    if success_fs and hasFileSystem then
+        local exists = false
+        pcall(function() exists = isfile(filepath) end)
+        
+        if not exists then
+            local success_download, data = pcall(function() return game:HttpGet(url) end)
+            if success_download and data then
+                pcall(function() writefile(filepath, data) end)
             end
         end
-        return getcustomasset(filepath)
+        
+        local assetPath
+        local success_asset = pcall(function()
+            assetPath = getcustomasset(filepath)
+        end)
+        
+        if success_asset and assetPath then
+            return assetPath
+        end
     end
 
-    return "" -- Return empty in environments like standard Roblox Studio testing
+    -- Return a robust fallback Roblox Icon asset ID (Eye/Visuals or Cog icon style)
+    return "rbxassetid://6034853644" 
 end
 
 function MercuryLib:Create(options)
