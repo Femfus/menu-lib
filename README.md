@@ -1,4 +1,4 @@
-# Vantura UI Library — Documentation
+# Vantura UI Library - Documentation
 
 ![Vantura UI Example Image](https://raw.githubusercontent.com/Femfus/menu-lib/main/assets/menu-example.png)
 
