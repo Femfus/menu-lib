@@ -381,13 +381,13 @@ function VanturaLib:Create(options)
             
             -- Fade in menu frame
             mainFrame.Visible = true
-            -- Set internal transparencies
-            mainFrame.BackgroundTransparency = 0
+            -- Set internal transparencies (0.15 for glassmorphism layout feel)
+            mainFrame.BackgroundTransparency = 0.15
             mainStroke.Transparency = 0
             topAccent.BackgroundTransparency = 0
-            iconSidebar.BackgroundTransparency = 0
+            iconSidebar.BackgroundTransparency = 0.15
             sidebarSeparator.BackgroundTransparency = 0
-            tabSidebar.BackgroundTransparency = 0
+            tabSidebar.BackgroundTransparency = 0.15
             tabSeparator.BackgroundTransparency = 0
         end)
     end
@@ -500,18 +500,6 @@ function VanturaLib:Create(options)
         toastStroke.Transparency = 1
         toastStroke.Parent = toastFrame
 
-        -- Notification Left Red Indicator Stripe
-        local toastStripe = Instance.new("Frame")
-        toastStripe.Size = UDim2.new(0, 3, 1, 0)
-        toastStripe.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
-        toastStripe.BorderSizePixel = 0
-        toastStripe.BackgroundTransparency = 1
-        toastStripe.Parent = toastFrame
-
-        local stripeCorner = Instance.new("UICorner")
-        stripeCorner.CornerRadius = UDim.new(0, 4)
-        stripeCorner.Parent = toastStripe
-
         -- Title Label
         local tLabel = Instance.new("TextLabel")
         tLabel.Size = UDim2.new(1, -20, 0.45, 0)
@@ -575,7 +563,6 @@ function VanturaLib:Create(options)
             Tween(dLabel, TweenInfo.new(0.2), { TextTransparency = 1 })
             Tween(tBar, TweenInfo.new(0.2), { BackgroundTransparency = 1 })
             Tween(toastStroke, TweenInfo.new(0.2), { Transparency = 1 })
-            Tween(toastStripe, TweenInfo.new(0.2), { BackgroundTransparency = 1 })
             local slideOut = Tween(toastFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { BackgroundTransparency = 1, Position = UDim2.new(0, 60, 0, 0) })
             
             slideOut.Completed:Connect(function()
@@ -590,9 +577,8 @@ function VanturaLib:Create(options)
         reparentToasts()
 
         -- Fade and slide in
-        Tween(toastFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { BackgroundTransparency = 0, Position = UDim2.new(0, 0, 0, 0) })
+        Tween(toastFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { BackgroundTransparency = 0.15, Position = UDim2.new(0, 0, 0, 0) })
         Tween(toastStroke, TweenInfo.new(0.25), { Transparency = 0 })
-        Tween(toastStripe, TweenInfo.new(0.25), { BackgroundTransparency = 0 })
         Tween(tLabel, TweenInfo.new(0.25), { TextTransparency = 0 })
         Tween(dLabel, TweenInfo.new(0.25), { TextTransparency = 0 })
         Tween(tBar, TweenInfo.new(0.25), { BackgroundTransparency = 0 })
