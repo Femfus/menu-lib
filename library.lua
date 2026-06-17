@@ -723,9 +723,12 @@ function VanturaLib:Create(options)
             local desc = btnOptions.Description or ""
             local callback = btnOptions.Callback or function() end
 
+            local hasDesc = (desc ~= "")
+            local frameHeight = hasDesc and 46 or 38
+
             local elementFrame = Instance.new("Frame")
             elementFrame.Name = btnName .. "_Element"
-            elementFrame.Size = UDim2.new(1, -6, 0, 38)
+            elementFrame.Size = UDim2.new(1, -6, 0, frameHeight)
             elementFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 26)
             elementFrame.BorderSizePixel = 0
             elementFrame.Parent = page
@@ -740,8 +743,8 @@ function VanturaLib:Create(options)
             elStroke.Parent = elementFrame
 
             local titleLabel = Instance.new("TextLabel")
-            titleLabel.Size = UDim2.new(0.7, 0, 1, 0)
-            titleLabel.Position = UDim2.new(0, 12, 0, 0)
+            titleLabel.Size = UDim2.new(0.7, 0, hasDesc and 0.5 or 1, 0)
+            titleLabel.Position = UDim2.new(0, 12, hasDesc and 0.08 or 0, 0)
             titleLabel.BackgroundTransparency = 1
             titleLabel.Text = btnName
             titleLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
@@ -749,6 +752,20 @@ function VanturaLib:Create(options)
             titleLabel.TextSize = 12
             titleLabel.TextXAlignment = Enum.TextXAlignment.Left
             titleLabel.Parent = elementFrame
+
+            if hasDesc then
+                local descLabel = Instance.new("TextLabel")
+                descLabel.Name = "Description"
+                descLabel.Size = UDim2.new(0.7, 0, 0.4, 0)
+                descLabel.Position = UDim2.new(0, 12, 0.5, 0)
+                descLabel.BackgroundTransparency = 1
+                descLabel.Text = desc
+                descLabel.TextColor3 = Color3.fromRGB(140, 140, 145)
+                descLabel.Font = Enum.Font.Gotham
+                descLabel.TextSize = 10
+                descLabel.TextXAlignment = Enum.TextXAlignment.Left
+                descLabel.Parent = elementFrame
+            end
 
             local actionBtn = Instance.new("TextButton")
             actionBtn.Name = "Trigger"
@@ -788,11 +805,15 @@ function VanturaLib:Create(options)
             toggleOptions = toggleOptions or {}
             local toggleName = toggleOptions.Name or "Toggle"
             local state = toggleOptions.StartingState or false
+            local desc = toggleOptions.Description or ""
             local callback = toggleOptions.Callback or function() end
+
+            local hasDesc = (desc ~= "")
+            local frameHeight = hasDesc and 46 or 38
 
             local elementFrame = Instance.new("Frame")
             elementFrame.Name = toggleName .. "_Element"
-            elementFrame.Size = UDim2.new(1, -6, 0, 38)
+            elementFrame.Size = UDim2.new(1, -6, 0, frameHeight)
             elementFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 26)
             elementFrame.BorderSizePixel = 0
             elementFrame.Parent = page
@@ -807,8 +828,8 @@ function VanturaLib:Create(options)
             elStroke.Parent = elementFrame
 
             local titleLabel = Instance.new("TextLabel")
-            titleLabel.Size = UDim2.new(0.7, 0, 1, 0)
-            titleLabel.Position = UDim2.new(0, 12, 0, 0)
+            titleLabel.Size = UDim2.new(0.7, 0, hasDesc and 0.5 or 1, 0)
+            titleLabel.Position = UDim2.new(0, 12, hasDesc and 0.08 or 0, 0)
             titleLabel.BackgroundTransparency = 1
             titleLabel.Text = toggleName
             titleLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
@@ -816,6 +837,20 @@ function VanturaLib:Create(options)
             titleLabel.TextSize = 12
             titleLabel.TextXAlignment = Enum.TextXAlignment.Left
             titleLabel.Parent = elementFrame
+
+            if hasDesc then
+                local descLabel = Instance.new("TextLabel")
+                descLabel.Name = "Description"
+                descLabel.Size = UDim2.new(0.7, 0, 0.4, 0)
+                descLabel.Position = UDim2.new(0, 12, 0.5, 0)
+                descLabel.BackgroundTransparency = 1
+                descLabel.Text = desc
+                descLabel.TextColor3 = Color3.fromRGB(140, 140, 145)
+                descLabel.Font = Enum.Font.Gotham
+                descLabel.TextSize = 10
+                descLabel.TextXAlignment = Enum.TextXAlignment.Left
+                descLabel.Parent = elementFrame
+            end
 
             local toggleBox = Instance.new("TextButton")
             toggleBox.Name = "ToggleBox"
@@ -869,14 +904,18 @@ function VanturaLib:Create(options)
             local ddName = ddOptions.Name or "Dropdown"
             local optionsList = ddOptions.Options or {}
             local default = ddOptions.Default or optionsList[1] or ""
+            local desc = ddOptions.Description or ""
             local callback = ddOptions.Callback or function() end
 
             local currentVal = default
             local expanded = false
 
+            local hasDesc = (desc ~= "")
+            local frameHeight = hasDesc and 46 or 38
+
             local elementFrame = Instance.new("Frame")
             elementFrame.Name = ddName .. "_Element"
-            elementFrame.Size = UDim2.new(1, -6, 0, 38)
+            elementFrame.Size = UDim2.new(1, -6, 0, frameHeight)
             elementFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 26)
             elementFrame.BorderSizePixel = 0
             elementFrame.ClipsDescendants = false
@@ -892,8 +931,8 @@ function VanturaLib:Create(options)
             elStroke.Parent = elementFrame
 
             local titleLabel = Instance.new("TextLabel")
-            titleLabel.Size = UDim2.new(0.4, 0, 1, 0)
-            titleLabel.Position = UDim2.new(0, 12, 0, 0)
+            titleLabel.Size = UDim2.new(0.4, 0, hasDesc and 0.5 or 1, 0)
+            titleLabel.Position = UDim2.new(0, 12, hasDesc and 0.08 or 0, 0)
             titleLabel.BackgroundTransparency = 1
             titleLabel.Text = ddName
             titleLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
@@ -901,6 +940,20 @@ function VanturaLib:Create(options)
             titleLabel.TextSize = 12
             titleLabel.TextXAlignment = Enum.TextXAlignment.Left
             titleLabel.Parent = elementFrame
+
+            if hasDesc then
+                local descLabel = Instance.new("TextLabel")
+                descLabel.Name = "Description"
+                descLabel.Size = UDim2.new(0.5, 0, 0.4, 0)
+                descLabel.Position = UDim2.new(0, 12, 0.5, 0)
+                descLabel.BackgroundTransparency = 1
+                descLabel.Text = desc
+                descLabel.TextColor3 = Color3.fromRGB(140, 140, 145)
+                descLabel.Font = Enum.Font.Gotham
+                descLabel.TextSize = 10
+                descLabel.TextXAlignment = Enum.TextXAlignment.Left
+                descLabel.Parent = elementFrame
+            end
 
             local selectorBtn = Instance.new("TextButton")
             selectorBtn.Name = "Selector"
